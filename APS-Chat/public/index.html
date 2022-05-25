@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Chat green company</title>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.5.1/socket.io.js" integrity="sha512-9mpsATI0KClwt+xVZfbcf2lJ8IFBAwsubJ6mI3rtULwyM3fBmQFzj0It4tGqxLOGQwGfJdk/G+fANnxfq9/cew==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+   
+  <link rel="stylesheet" href="styles.css">
+  
+</head>
+<body>
+    <form id="chat" enctype="multipart/form-data">
+        <div class="messages"></div>
+        <input type="text" name="username" placeholder="Digite seu usuário"> 
+        <br>           
+        <input type="text" name="message" placeholder="Digite sua mensagem">
+        <br>
+        
+        <button type="submit">Enviar</button>
+    </form>
+
+    <script type="text/javascript">
+
+        var socket = io('http://localhost:3000'); 
+        
+        var data = new Date();
+        var dia = String(data.getDate()).padStart(2, '0');
+        var mes = String(data.getMonth() + 1).padStart(2, '0');
+        var ano = data.getFullYear();
+        
+        const hora    = data.getHours();          // 0-23
+        const min     = data.getMinutes();        // 0-59
+
+        var str_hora = hora + ':' + min;
+        //dataAtual = dia + '/' + mes + '/' + ano /*+ timeElapsed*/;
+
+        // imprimindo mensagem na div
+        function renderMessage(message){
+            $('.messages').append(
+                '<div class="message">'+ str_hora +' <strong>'+message.author+'</strong>: '+message.message+'</div>'
+                );
+        }
+            // recarregando as mensagens enviadas
+            socket.on('previousMessages', function(messages){
+                for(message of messages){
+                    renderMessage(message);
+                }
+            });
+
+            // reproduzindo as mensagens em todos os chats conectados
+            socket.on('receivedMessage', function(message){
+                renderMessage(message);
+            });
+
+            // função que envia os dados para o socket
+            $('#chat').submit(function(event){
+            event.preventDefault();
+
+            var author = $('input[name=username]').val();
+            var message = $('input[name=message]').val();
+
+            if(author.length && message.length){
+                var messageObject ={
+                    author: author,
+                    message: message
+                };
+                
+                renderMessage(messageObject);
+                socket.emit('sendMessage', messageObject);
+
+                document.getElementById('chat').reset();
+            }
+        });
+
+    </script>
+</body>
+</html>
