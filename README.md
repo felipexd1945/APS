@@ -7,7 +7,7 @@ dos alunos cursantes do 6° semestre do curso de Ciência da Computação, sob a
 
 from 2019.
 
-Click on the image to watch a demo video.
+Click the image to watch a demo video on YouTube.
 
 [![Assista ao vídeo](https://img.youtube.com/vi/B1rfpQu2jdU/hqdefault.jpg)](https://www.youtube.com/watch?v=B1rfpQu2jdU)
 
